@@ -5,6 +5,16 @@
 
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
 
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+
     <application
         android:label="wallpaperworld"
         android:name="${applicationName}"

@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -6,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter/material.dart';
 import 'package:insta_image_viewer/insta_image_viewer.dart';
-
+import 'package:wallpaperworld/widget/buymeacoffee.dart';
 
 class WallpaperApp extends StatefulWidget {
   const WallpaperApp({super.key});
@@ -17,19 +16,23 @@ class WallpaperApp extends StatefulWidget {
 
 class _WallpaperAppState extends State<WallpaperApp> {
 
-  Color myHexColor = Color(0xFF92D6DB);
+  Color myHexColor = const Color(0xFF92D6DB);
   List data = [];
 
   TextEditingController searchImage = TextEditingController();
 
   final List<String> categories = [
-    'Architecture',
-    'Movie',
-    'Travel',
-    'Animal',
-    'Food',
-    'Sport',
-    'Nature',
+    'Mosque',
+    'Islamic calligraphy',
+    'Hadith',
+    'Quranic Verses',
+    'Allah',
+    'Islamic Festival',
+    'Namaz',
+    'Islamic Heritage',
+    'Hijab and Modesty',
+    'Kids and Education',
+    'Inspirational Quotes',
   ];
 
   @override
@@ -60,34 +63,15 @@ class _WallpaperAppState extends State<WallpaperApp> {
     }
   }
 
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: ListView(
-        children: [
-          SizedBox(height: 10,),
-          topRow(),
-          searchbar(),
-          Center(child: Text('Categories can have a look at',
-            style: TextStyle(fontWeight: FontWeight.bold),)),
-          SizedBox(height: 20,),
-          horizontalbuilder(),
-          SizedBox(height: 20,),
-          verticalBuilder(),
-        ],
-      ),
-    );
-  }
   Future<void> setWallpaper(String imageUrl) async {
     try {
       // You can use the downloaded image path or the URL directly.
       final String imagePath = imageUrl;
 
       // Use platform channel to call native code for setting wallpaper.
-      final MethodChannel _channel = MethodChannel('wallpaper_channel');
+      const MethodChannel channel = MethodChannel('wallpaper_channel');
       final bool success =
-      await _channel.invokeMethod('setWallpaper', {'imageUrl': imagePath});
+      await channel.invokeMethod('setWallpaper', {'imageUrl': imagePath});
 
       if (success) {
         print('Wallpaper set successfully.');
@@ -99,70 +83,92 @@ class _WallpaperAppState extends State<WallpaperApp> {
     }
   }
 
-  // Widget verticalBuilder(){
-  //   return data.isNotEmpty?MasonryGridView.count(
-  //       crossAxisCount: 2,
-  //       itemCount: data.length,
-  //       shrinkWrap: true,
-  //       physics: NeverScrollableScrollPhysics(),
-  //       itemBuilder: (context,index){
-  //         double ht=index%2==0?200:100;
-  //         return Padding(
-  //           padding: const EdgeInsets.all(10),
-  //             child: InstaImageViewer(
-  //               child: ClipRRect(
-  //                 borderRadius: BorderRadius.circular(12),
-  //                 child: Image.network(data[index]['urls']['regular'],
-  //                   height: ht,
-  //                   fit: BoxFit.cover,
-  //                 ),
-  //               ),
-  //             ),
-  //         );
-  //       }):Container(
-  //       height: 500,
-  //       child: Center(child: SpinKitCircle(color: Colors.grey),));
-  // }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: ListView(
+        children: [
+          const SizedBox(height: 10,),
+          topRow(),
+          searchbar(),
+          const Center(
+            child: Text(
+              'Categories can have a look at',
+              style: TextStyle(
+                  fontWeight: FontWeight.bold
+              ),
+            ),
+          ),
+          const SizedBox(height: 20,),
+          horizontalbuilder(),
+          const SizedBox(height: 20,),
+          verticalBuilder(),
+          const SizedBox(height: 20,),
+          const BuyMeACoffee(),
+        ],
+      ),
+    );
+  }
 
-
-  Widget verticalBuilder(){
-    return data.isNotEmpty?MasonryGridView.count(
-        crossAxisCount: 2,
-        itemCount: data.length,
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        itemBuilder: (context,index){
-          double ht=index%2==0?200:100;
-          return Padding(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              children: [
-                InstaImageViewer(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.network(data[index]['urls']['regular'],
-                      height: ht,
-                      fit: BoxFit.cover,
-                    ),
+  Widget verticalBuilder() {
+    return data.isNotEmpty ? MasonryGridView.count(
+      crossAxisCount: 2,
+      itemCount: data.length,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemBuilder: (context, index) {
+        double ht = index % 2 == 0 ? 200 : 100;
+        return Padding(
+          padding: const EdgeInsets.all(10),
+          child: GestureDetector(
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) => Dialog(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      InstaImageViewer(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.network(
+                            data[index]['urls']['regular'],
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          String imageUrl = data[index]['urls']['regular'];
+                          setWallpaper(imageUrl);
+                          Navigator.of(context).pop(); // Close the dialog
+                        },
+                        child: const Text('Set as Wallpaper'),
+                      ),
+                    ],
                   ),
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    String imageUrl = data[index]['urls']['regular'];
-                    setWallpaper(imageUrl);
-                  },
-                  child: Text('Set as Wallpaper'),
-                ),
-              ],
+              );
+            },
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.network(
+                data[index]['urls']['regular'],
+                height: ht,
+                fit: BoxFit.cover,
+              ),
             ),
-          );
-        }):Container(
-        height: 500,
-        child: Center(child: SpinKitCircle(color: Colors.grey),));
+          ),
+        );
+      },
+    ) : const SizedBox(
+      height: 500,
+      child: Center(child: SpinKitCircle(color: Colors.grey),),
+    );
   }
 
   Widget horizontalbuilder() {
-    return Container(
+    return SizedBox(
       height: 50,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
@@ -174,7 +180,7 @@ class _WallpaperAppState extends State<WallpaperApp> {
               getphoto(categories[index]);
             },
             child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 8.0),
+              margin: const EdgeInsets.symmetric(horizontal: 8.0),
               width: 150,
               height: 100,
               decoration: BoxDecoration(
@@ -200,9 +206,9 @@ class _WallpaperAppState extends State<WallpaperApp> {
                   Center(
                     child: Text(
                       categories[index],
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 18.0,
+                        fontSize: 14.0,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -218,7 +224,7 @@ class _WallpaperAppState extends State<WallpaperApp> {
 
   Widget searchbar() {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       decoration: BoxDecoration(
         color: Colors.grey[100],
         borderRadius: BorderRadius.circular(8.0),
@@ -230,7 +236,7 @@ class _WallpaperAppState extends State<WallpaperApp> {
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: TextField(
                 controller: searchImage,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'Search images here',
                   border: InputBorder.none,
                 ),
@@ -238,7 +244,7 @@ class _WallpaperAppState extends State<WallpaperApp> {
             ),
           ),
           IconButton(
-            icon: Icon(Icons.search),
+            icon: const Icon(Icons.search),
             color: myHexColor,
             iconSize: 30,
             onPressed: () {
@@ -284,5 +290,4 @@ class _WallpaperAppState extends State<WallpaperApp> {
       ],
     );
   }
-
 }
